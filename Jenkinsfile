@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        disableConcurrentBuilds()
+    }
+
     environment {
         IMAGE = "localhost:5000/mycompany/payment"
         TAG = "${BUILD_NUMBER}"
