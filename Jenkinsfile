@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "mycompany/payment"
+        IMAGE = "localhost:5000/mycompany/payment"
         TAG = "${BUILD_NUMBER}"
+        RELEASE_TAG = "release-${BUILD_NUMBER}"
     }
 
     stages {
@@ -22,13 +23,13 @@ pipeline {
 
         stage('Tag') {
             steps {
-                bat 'docker tag %IMAGE%:%TAG% %IMAGE%:release-%BUILD_NUMBER%'
+                bat 'docker tag %IMAGE%:%TAG% %IMAGE%:%RELEASE_TAG%'
             }
         }
 
         stage('Push') {
             steps {
-                bat 'echo Image ready: %IMAGE%:release-%BUILD_NUMBER%'
+                bat 'docker push %IMAGE%:%RELEASE_TAG%'
             }
         }
 
@@ -41,19 +42,19 @@ pipeline {
                     docker run -d ^
                       --name payment ^
                       -p 8099:8080 ^
-                      -e APP_VERSION=%BUILD_NUMBER% ^
+                      -e APP_VERSION=%RELEASE_TAG% ^
                       -e BUILD_NUMBER=%BUILD_NUMBER% ^
                       -e GIT_COMMIT=%GIT_COMMIT% ^
                       -e BRANCH_NAME=main ^
-                      %IMAGE%:release-%BUILD_NUMBER%
+                      %IMAGE%:%RELEASE_TAG%
 
                     echo ========================================
                     echo       DEPLOYMENT INFORMATION
                     echo ========================================
-                    echo Application Version: %BUILD_NUMBER%
+                    echo Application Version: %RELEASE_TAG%
                     echo Git Commit: %GIT_COMMIT%
                     echo Branch: main
-                    echo Docker Image: %IMAGE%:release-%BUILD_NUMBER%
+                    echo Docker Image: %IMAGE%:%RELEASE_TAG%
                     echo Jenkins Build: %BUILD_NUMBER%
                     echo ========================================
                 '''
