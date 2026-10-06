@@ -22,13 +22,13 @@ pipeline {
 
         stage('Tag') {
             steps {
-                bat 'docker tag %IMAGE%:%TAG% %IMAGE%:%BUILD_NUMBER%'
+                bat 'docker tag %IMAGE%:%TAG% %IMAGE%:release-%BUILD_NUMBER%'
             }
         }
 
         stage('Push') {
             steps {
-                bat 'echo Image ready: %IMAGE%:%BUILD_NUMBER%'
+                bat 'echo Image ready: %IMAGE%:release-%BUILD_NUMBER%'
             }
         }
 
@@ -44,15 +44,16 @@ pipeline {
                       -e APP_VERSION=%BUILD_NUMBER% ^
                       -e BUILD_NUMBER=%BUILD_NUMBER% ^
                       -e GIT_COMMIT=%GIT_COMMIT% ^
-                      -e BRANCH_NAME=%BRANCH_NAME% ^
-                      %IMAGE%:%BUILD_NUMBER%
+                      -e BRANCH_NAME=main ^
+                      %IMAGE%:release-%BUILD_NUMBER%
 
                     echo ========================================
                     echo       DEPLOYMENT INFORMATION
                     echo ========================================
                     echo Application Version: %BUILD_NUMBER%
                     echo Git Commit: %GIT_COMMIT%
-                    echo Docker Image: %IMAGE%:%BUILD_NUMBER%
+                    echo Branch: main
+                    echo Docker Image: %IMAGE%:release-%BUILD_NUMBER%
                     echo Jenkins Build: %BUILD_NUMBER%
                     echo ========================================
                 '''
